@@ -14,13 +14,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Checkout Core Business repository
+        uses: actions/checkout@v4
+        with:
+          repository: Connectivity-services-ad-PT/lab-3-leanhtg1102
+          path: core
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
+          cd core && npm install && cd ..
 
       - name: Lint OpenAPI contracts
         run: npm run lint:contracts
@@ -29,7 +38,7 @@ jobs:
         run: |
           npx prism mock contracts/iot-ingestion.openapi.yaml -p 4010 --host 127.0.0.1 > prism-iot.log 2>&1 &
           PRISM_PID=$!
-          npm run mock:core > core-business.log 2>&1 &
+          (cd core && npm run mock:core) > core-business.log 2>&1 &
           CORE_PID=$!
           sleep 5
           echo "=== prism process ==="
