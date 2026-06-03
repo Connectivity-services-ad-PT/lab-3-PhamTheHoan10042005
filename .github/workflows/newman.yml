@@ -27,7 +27,7 @@ jobs:
 
       - name: Start Prism mock server
         run: |
-          nohup npm run mock:iot > prism-iot.log 2>&1 &
+          npx prism mock contracts/iot-ingestion.openapi.yaml -p 4010 --host 0.0.0.0 > prism-iot.log 2>&1 &
           sleep 5
 
       - name: Wait for mock server
