@@ -38,7 +38,7 @@ jobs:
         run: |
           npx prism mock contracts/iot-ingestion.openapi.yaml -p 4010 --host 127.0.0.1 > prism-iot.log 2>&1 &
           PRISM_PID=$!
-          (cd core && npm run mock:core) > core-business.log 2>&1 &
+          npx prism mock core/contracts/team-core.openapi.yaml -p 4016 --host 127.0.0.1 > core-business.log 2>&1 &
           CORE_PID=$!
           sleep 5
           echo "=== prism process ==="
