@@ -35,8 +35,16 @@ jobs:
           echo "=== prism log after start ==="
           cat prism-iot.log || true
           echo "=== health check ==="
-          curl -v http://127.0.0.1:4010/health || true
-          npx wait-on http-get://127.0.0.1:4015/health --timeout 120000
+          timeout=120
+          until curl -sSf http://127.0.0.1:4010/health >/dev/null 2>&1; do
+            timeout=$((timeout - 1))
+            if [ "$timeout" -le 0 ]; then
+              echo "Prism health check failed after 120 seconds"
+              cat prism-iot.log || true
+              exit 1
+            fi
+            sleep 1
+          done
           npm run test:mock
           kill "$PRISM_PID" || true
 
