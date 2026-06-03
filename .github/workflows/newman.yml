@@ -29,24 +29,29 @@ jobs:
         run: |
           npx prism mock contracts/iot-ingestion.openapi.yaml -p 4010 --host 127.0.0.1 > prism-iot.log 2>&1 &
           PRISM_PID=$!
+          npm run mock:core > core-business.log 2>&1 &
+          CORE_PID=$!
           sleep 5
           echo "=== prism process ==="
           ps -ef | grep prism | grep -v grep || true
           echo "=== prism log after start ==="
           cat prism-iot.log || true
+          echo "=== core business mock log after start ==="
+          cat core-business.log || true
           echo "=== health check ==="
           timeout=120
-          until curl -sSf http://127.0.0.1:4010/health >/dev/null 2>&1; do
+          until curl -sSf http://127.0.0.1:4010/health >/dev/null 2>&1 && curl -sSf http://127.0.0.1:4016/health >/dev/null 2>&1; do
             timeout=$((timeout - 1))
             if [ "$timeout" -le 0 ]; then
-              echo "Prism health check failed after 120 seconds"
+              echo "Mock health check failed after 120 seconds"
               cat prism-iot.log || true
+              cat core-business.log || true
               exit 1
             fi
             sleep 1
           done
           npm run test:mock
-          kill "$PRISM_PID" || true
+          kill "$PRISM_PID" "$CORE_PID" || true
 
       - name: Show Prism logs on failure
         if: failure()

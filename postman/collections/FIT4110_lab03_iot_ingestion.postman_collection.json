@@ -637,7 +637,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Kiểm tra kết nối - Gọi sang máy chủ giả lập của nhóm Analytics phải thông suốt\", function () {\r",
+                  "pm.test(\"Kiểm tra kết nối - Gọi sang máy chủ giả lập của nhóm Core Business phải thông suốt\", function () {\r",
                   "    pm.expect([200, 201, 202]).to.include(pm.response.code);\r",
                   "});"
                 ],
