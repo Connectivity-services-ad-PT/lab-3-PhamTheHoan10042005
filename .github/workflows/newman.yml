@@ -27,9 +27,16 @@ jobs:
 
       - name: Start Prism mock server and run Newman contract tests
         run: |
-          npx prism mock contracts/iot-ingestion.openapi.yaml -p 4010 --host 0.0.0.0 > prism-iot.log 2>&1 &
+          npx prism mock contracts/iot-ingestion.openapi.yaml -p 4015 --host 127.0.0.1 > prism-iot.log 2>&1 &
           PRISM_PID=$!
-          npx wait-on http://127.0.0.1:4010/health --timeout 120000
+          sleep 5
+          echo "=== prism process ==="
+          ps -ef | grep prism | grep -v grep || true
+          echo "=== prism log after start ==="
+          cat prism-iot.log || true
+          echo "=== health check ==="
+          curl -v http://127.0.0.1:4015/health || true
+          npx wait-on http://127.0.0.1:4015/health --timeout 120000
           npm run test:mock
           kill "$PRISM_PID" || true
 
